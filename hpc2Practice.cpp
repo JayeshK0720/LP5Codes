@@ -155,3 +155,6 @@ int main(){
     return 0;
 }
 
+// to run this file:
+// g++ filename.cpp -o filename -fopenmp -std=c++11
+// ./filename

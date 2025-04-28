@@ -138,3 +138,8 @@ int main()
 
     return 0;
 }
+
+
+// run command :
+// nvcc filename.cu -o filename
+// ./filename
