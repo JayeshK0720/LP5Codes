@@ -1,0 +1,75 @@
+import pandas as pd 
+import numpy as np 
+import matplotlib.pyplot as plt 
+import seaborn as sns
+
+df = pd.read_csv('BostonHousing.csv')
+df.head()
+df.tail()
+df.info
+df.describe()
+
+df.drop('ID', axis = 1, inplace= True)
+
+plt.subplots(figsize=(12,8))
+sns.heatmap(df.corr(), annot=True, cmap="RdGy")
+
+sns.pairplot(df, vars = ['lstat', 'ptratio', 'indus', 'tax', 'crim', 'nox', 'rad', 'age', 'medv'])
+
+X = df[['crim', 'zn', 'indus', 'chas', 'nox', 'rm', 'age', 'dis', 'rad', 'tax', 'ptratio', 'lstat']]
+y = df['medv']
+
+
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.4)
+lm = LinearRegression()
+lm.fit(X_train, y_train)
+predictions = lm.predict(X_test)
+plt.scatter(y_test, predictions)
+plt.xlabel('Y Test')
+plt.ylabel('Predicted Y')
+
+
+from sklearn import metrics
+print('MAE:', metrics.mean_absolute_error(y_test, predictions))
+print('MSE:', metrics.mean_squared_error(y_test, predictions))
+print('RMSE:', np.sqrt(metrics.mean_squared_error(y_test, predictions)))
+
+
+sns.displot((y_test - predictions), bins = 50)
+
+from sklearn.preprocessing import StandardScaler
+sc = StandardScaler()
+X_train = sc.fit_transform(X_train)
+X_test = sc.transform(X_test)
+
+## !pip install --upgrade pip
+## !pip install keras
+## !pip install tensorflow
+## !pip show tensorflow
+
+from tensorflow.keras.models import Sequential
+model = Sequential()
+
+from tensorflow.keras.layers import Dense
+model.add(Dense(units = 128, activation='relu', input_shape=(13,)))
+model.add(Dense(units = 64, activation='relu))
+model.add(Dense(units = 32, activation='relu'))
+model.add(Dense(units = 16, activation='relu'))
+model.add(Dense(1))
+
+model.summary()
+model.compile(optimizer='adam', loss='mean_squared_error', metrics=['mae'])
+history = model.fit(X_train, y_train, epochs=15, verbose = 1, validation_split=0.05)
+
+y_pred = model.predict(X_test)
+mse_nn, mae_nn = model.evaluate(X_test, y_test)
+print('Mean absolute error on test data using NN: ', mae_nn)
+print('Mean squared error on test data using NN: ', mse_nn)
+print('RMSE using NN: ', np.sqrt(mse_nn))
+
+
+plt.scatter(y_test, y_pred)
+plt.xlabel('Y Test')
+plt.ylabel('Predicted Y')
